@@ -1,17 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { request } from "./api";
 import type { Entries } from "./weeks";
-
-async function request(url: string, init?: RequestInit): Promise<Response> {
-  const res = await fetch(url, init);
-  if (res.status === 401) {
-    window.location.href = "/unlock"; // PIN cookie expired or was cleared
-    throw new Error("Locked");
-  }
-  if (!res.ok) throw new Error(`Request failed (${res.status})`);
-  return res;
-}
 
 /** Weight entries for one user, stored in the database. `entries` is null until loaded. */
 export function useWeightEntries(userId: string) {
@@ -20,8 +11,11 @@ export function useWeightEntries(userId: string) {
   const url = `/api/weights/${userId}`;
 
   useEffect(() => {
+    setEntries(null); // switching user: don't show the previous person's data
+  }, [url]);
+
+  useEffect(() => {
     let cancelled = false;
-    setEntries(null);
     setLoadError(false);
     request(url)
       .then((res) => res.json())

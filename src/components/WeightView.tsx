@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useWeightEntries } from "@/lib/storage";
+import { useHeightVar } from "@/lib/use-height-var";
 import { todayISO } from "@/lib/weeks";
 import { Loading, formatDate } from "./format";
 
@@ -14,6 +15,7 @@ export function WeightView({ userId }: { userId: string }) {
   const [weight, setWeightInput] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const formRef = useHeightVar("--weight-form-h");
 
   if (!entries) return <Loading error={loadError} />;
 
@@ -48,7 +50,8 @@ export function WeightView({ userId }: { userId: string }) {
   return (
     <>
       <h1>Log weight</h1>
-      <form className="panel form" onSubmit={submit}>
+      <div className="sticky-block" ref={formRef}>
+      <form className="panel form weight-form" onSubmit={submit}>
         <label>
           Date
           <input type="date" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} required />
@@ -70,13 +73,14 @@ export function WeightView({ userId }: { userId: string }) {
         <button type="submit" disabled={saving}>{saving ? "Saving…" : "Save"}</button>
         {error && <p className="error" role="alert">{error}</p>}
       </form>
+      </div>
       <p className="muted">Saving a date that already has an entry replaces it.</p>
 
       <h2>History</h2>
       {dates.length === 0 ? (
         <p className="muted">No entries yet.</p>
       ) : (
-        <table>
+        <table className="weight-history">
           <thead>
             <tr>
               <th>Date</th>

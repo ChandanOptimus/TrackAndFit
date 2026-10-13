@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { calculateTargets } from "@/lib/formulas";
+import { useFoodLog, useFoods } from "@/lib/food-store";
+import { totalsFor } from "@/lib/nutrition";
 import { useWeightEntries } from "@/lib/storage";
 import { getUser } from "@/lib/users";
 import { buildWeeks, todayISO } from "@/lib/weeks";
 import { ChangeText, GradeBadge, Loading, formatDate } from "./format";
+import { IntakeSummary } from "./IntakeSummary";
 import { TargetsGrid } from "./TargetsGrid";
 
 export function DashboardView({ userId }: { userId: string }) {
   const user = getUser(userId);
   const { entries, loadError } = useWeightEntries(userId);
+  const today = todayISO();
+  const { foods, loadError: foodsError } = useFoods();
+  const { entries: foodLog, loadError: foodLogError } = useFoodLog(userId, today);
 
   if (!entries) return <Loading error={loadError} />;
 
@@ -18,7 +24,7 @@ export function DashboardView({ userId }: { userId: string }) {
   const latestDate = dates[dates.length - 1];
   const latestWeight = latestDate ? entries[latestDate] : null;
 
-  const completed = buildWeeks(entries, todayISO()).filter((w) => w.complete && w.average !== null);
+  const completed = buildWeeks(entries, today).filter((w) => w.complete && w.average !== null);
   const lastWeek = completed[completed.length - 1];
 
   return (
@@ -46,6 +52,21 @@ export function DashboardView({ userId }: { userId: string }) {
             <h2>Daily targets</h2>
             <p className="muted">Based on your latest weight.</p>
             <TargetsGrid targets={calculateTargets(latestWeight)} />
+          </section>
+
+          <section>
+            <h2>Today&apos;s progress</h2>
+            {foods && foodLog ? (
+              <>
+                <p className="muted">
+                  What you&apos;ve eaten today against your targets.{" "}
+                  <Link href={`/${userId}/food`}>{foodLog.length ? "Log more food →" : "Log your food →"}</Link>
+                </p>
+                <IntakeSummary totals={totalsFor(foodLog, foods)} targets={calculateTargets(latestWeight)} />
+              </>
+            ) : (
+              <Loading error={foodsError || foodLogError} />
+            )}
           </section>
         </>
       )}
