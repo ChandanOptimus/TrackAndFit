@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { jsonInit, request } from "./api";
 import type { FoodInput } from "./food-validation";
-import type { CustomNutrition, Food, LogEntry } from "./nutrition";
+import type { CustomNutrition, Food, LogEntry, MealId } from "./nutrition";
 
 const byName = (a: Food, b: Food) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 
@@ -37,6 +37,10 @@ export function useFoods() {
   return { foods, loadError, saveFood, removeFood };
 }
 
+export type EntryPayload =
+  | { foodId: number; amount: number; unit: string; category: MealId | null }
+  | { custom: CustomNutrition; category: MealId | null };
+
 /** One user's food log for one day. `entries` is null until loaded. */
 export function useFoodLog(userId: string, date: string) {
   const [entries, setEntries] = useState<LogEntry[] | null>(null);
@@ -56,20 +60,16 @@ export function useFoodLog(userId: string, date: string) {
     };
   }, [url, date]);
 
-  const addEntry = useCallback(
-    async (foodId: number, amount: number, unit: string) => {
-      const res = await request(url, jsonInit("POST", { date, foodId, amount, unit }));
+  /** Adds an entry, or edits entry `id`. Throws with the server's message if it is rejected. */
+  const saveEntry = useCallback(
+    async (payload: EntryPayload, id?: number) => {
+      const res = id
+        ? await request(`${url}?id=${id}`, jsonInit("PUT", payload))
+        : await request(url, jsonInit("POST", { date, ...payload }));
       const { entry } = (await res.json()) as { entry: LogEntry };
-      setEntries((prev) => [...(prev ?? []), entry]);
-    },
-    [url, date],
-  );
-
-  const addCustomEntry = useCallback(
-    async (custom: CustomNutrition) => {
-      const res = await request(url, jsonInit("POST", { date, custom }));
-      const { entry } = (await res.json()) as { entry: LogEntry };
-      setEntries((prev) => [...(prev ?? []), entry]);
+      setEntries((prev) =>
+        id ? (prev ?? []).map((e) => (e.id === id ? entry : e)) : [...(prev ?? []), entry],
+      );
     },
     [url, date],
   );
@@ -82,5 +82,5 @@ export function useFoodLog(userId: string, date: string) {
     [url],
   );
 
-  return { entries, loadError, addEntry, addCustomEntry, removeEntry };
+  return { entries, loadError, saveEntry, removeEntry };
 }

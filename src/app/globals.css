@@ -413,3 +413,20 @@ tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
 }
 .hero-link { color: #fff; font-weight: 700; text-decoration: underline; }
 .stat-inline { font-weight: 700; margin-right: 0.25rem; }
+
+/* ---------- Meals and editing ---------- */
+.group-row td, .group-row:hover td { background: var(--user-soft); color: var(--user); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.45rem 0.9rem; }
+.group-kcal { text-transform: none; letter-spacing: 0; font-weight: 700; opacity: 0.85; }
+.list li.group-header { background: var(--user-soft); color: var(--user); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 1rem; justify-content: space-between; }
+.food-log tr.editing td, .list li.editing { background: color-mix(in srgb, var(--user) 12%, transparent); }
+.edit-banner { margin: 0; flex: 1 1 100%; font-weight: 700; color: var(--user); }
+.food-form .meal-field { min-width: 0; }
+.food-form .meal-field select { width: 100%; }
+@media (max-width: 1024px) {
+  .food-form .meal-field { grid-column: 1 / -1; }
+}
+
+/* ---------- Calorie plan note ---------- */
+.plan-note { border-left: 6px solid var(--down); margin: 0.5rem 0 0.9rem; padding: 0.7rem 1rem; }
+.plan-note.plan-half { border-left-color: #f4a21f; }
+.plan-note.plan-none { border-left-color: #3aa7ff; }

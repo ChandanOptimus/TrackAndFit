@@ -52,6 +52,8 @@ async function setup(sql: Sql) {
   // Manual "Others" entries have no food. These are safe to repeat on tables that already exist.
   await sql`ALTER TABLE food_log ALTER COLUMN food_id DROP NOT NULL`;
   await sql`ALTER TABLE food_log ADD COLUMN IF NOT EXISTS custom jsonb`;
+  // Which meal an entry belongs to (breakfast, lunch, dinner, snacks, supplements). Older entries stay null.
+  await sql`ALTER TABLE food_log ADD COLUMN IF NOT EXISTS category text`;
   await sql`CREATE INDEX IF NOT EXISTS food_log_user_day ON food_log (user_id, day)`;
 
   if (!existed) {

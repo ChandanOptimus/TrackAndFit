@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseCustomNutrition, parseFoodInput } from "./food-validation";
 import { SEED_FOODS } from "./seed-foods";
-import { gramsFor, nutrientsFor, totalsFor, type Food } from "./nutrition";
+import { MEALS, gramsFor, groupByMeal, isMealId, nutrientsFor, totalsFor, type Food } from "./nutrition";
 
 const toFood = (name: string, id: number): Food => {
   const s = SEED_FOODS.find((f) => f.name === name)!;
@@ -84,5 +84,29 @@ describe("manual (Others) entries", () => {
     expect(typeof parseCustomNutrition({ kcal: "abc" })).toBe("string");
     expect(typeof parseCustomNutrition({ protein: 5000 })).toBe("string");
     expect(typeof parseCustomNutrition(null)).toBe("string");
+  });
+});
+
+describe("meals", () => {
+  it("offers the five meals in order", () => {
+    expect(MEALS.map((m) => m.label)).toEqual(["Breakfast", "Lunch", "Dinner", "Snacks", "Supplements"]);
+    expect(isMealId("snacks")).toBe(true);
+    expect(isMealId("brunch")).toBe(false);
+    expect(isMealId(null)).toBe(false);
+  });
+
+  it("groups entries by meal in order, with uncategorised ones last and empty groups omitted", () => {
+    const entries = [
+      { id: 1, category: "dinner" as const },
+      { id: 2, category: null },
+      { id: 3, category: "breakfast" as const },
+      { id: 4 },
+      { id: 5, category: "breakfast" as const },
+    ];
+    const groups = groupByMeal(entries);
+    expect(groups.map((g) => g.label)).toEqual(["Breakfast", "Dinner", "No meal"]);
+    expect(groups[0].entries.map((e) => e.id)).toEqual([3, 5]);
+    expect(groups[2].entries.map((e) => e.id)).toEqual([2, 4]);
+    expect(groupByMeal([])).toEqual([]);
   });
 });

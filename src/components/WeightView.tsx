@@ -10,6 +10,7 @@ import {
   bmiOf,
   bodyFatLevel,
 } from "@/lib/health";
+import { planFor } from "@/lib/plan";
 import { useHeight } from "@/lib/profile-store";
 import { useWeightEntries } from "@/lib/storage";
 import { useHeightVar } from "@/lib/use-height-var";
@@ -180,7 +181,7 @@ export function WeightView({ userId }: { userId: string }) {
                     {fatValue === undefined ? <span className="muted">–</span> : (
                       <>
                         {fatValue.toFixed(1)}%
-                        <LevelPill level={bodyFatLevel(fatValue)} />
+                        <LevelPill level={bodyFatLevel(fatValue, planFor(userId).bodyFatLimits)} />
                       </>
                     )}
                   </td>

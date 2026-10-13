@@ -35,8 +35,9 @@ export function bmiLevel(bmi: number): Level {
   return levelFor(bmi, BMI_LIMITS);
 }
 
-export function bodyFatLevel(percent: number): Level {
-  return levelFor(percent, BODY_FAT_LIMITS);
+/** `limits` can be personal (women's body fat runs higher), see plan.ts. */
+export function bodyFatLevel(percent: number, limits: Limits = BODY_FAT_LIMITS): Level {
+  return levelFor(percent, limits);
 }
 
 export function average(values: number[]): number | null {

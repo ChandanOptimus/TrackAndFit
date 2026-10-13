@@ -26,6 +26,20 @@ export interface CustomNutrition {
   fibre: number;
 }
 
+export const MEALS = [
+  { id: "breakfast", label: "Breakfast" },
+  { id: "lunch", label: "Lunch" },
+  { id: "dinner", label: "Dinner" },
+  { id: "snacks", label: "Snacks" },
+  { id: "supplements", label: "Supplements" },
+] as const;
+
+export type MealId = (typeof MEALS)[number]["id"];
+
+export function isMealId(value: unknown): value is MealId {
+  return MEALS.some((m) => m.id === value);
+}
+
 export interface LogEntry {
   id: number;
   foodId: number | null; // null for a manual "Others" entry
@@ -33,6 +47,7 @@ export interface LogEntry {
   unit: string; // "g" or one of the food's unit labels
   grams: number; // grams at the time it was logged
   custom?: CustomNutrition | null; // set for manual entries
+  category?: MealId | null; // null for entries logged before meals existed
 }
 
 /** The food-list choice that lets you type nutrition in manually. It isn't stored in the library. */
@@ -104,4 +119,17 @@ export function totalsFor(log: LogEntry[], foods: Food[]): Nutrients {
 export function describeAmount(amount: number, unit: string): string {
   const n = Math.round(amount * 100) / 100;
   return unit === GRAMS ? `${n} g` : `${n} ${unit}`;
+}
+
+/** Entries grouped by meal in the order Breakfast, Lunch, Dinner, Snacks, Supplements. Empty groups are left out. */
+export function groupByMeal<T extends { category?: MealId | null }>(
+  entries: T[],
+): { id: MealId | null; label: string; entries: T[] }[] {
+  const groups = MEALS.map((m) => ({
+    id: m.id as MealId | null,
+    label: m.label as string,
+    entries: entries.filter((e) => e.category === m.id),
+  }));
+  groups.push({ id: null, label: "No meal", entries: entries.filter((e) => !isMealId(e.category)) });
+  return groups.filter((g) => g.entries.length > 0);
 }

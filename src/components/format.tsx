@@ -10,12 +10,19 @@ export function formatDate(date: string): string {
   });
 }
 
-export function ChangeText({ change }: { change: number | null }) {
+/** Weekly change in kg. Pass `base` (the earlier average) to also show it as a percentage. */
+export function ChangeText({ change, base }: { change: number | null; base?: number | null }) {
   if (change === null) return <span className="muted">—</span>;
   const rounded = Math.round(change * 100) / 100;
   const cls = rounded < 0 ? "down" : rounded > 0 ? "up" : "";
   const sign = rounded > 0 ? "+" : "";
-  return <span className={cls}>{sign}{rounded.toFixed(2)} kg</span>;
+  const percent = base ? Math.round((change / base) * 1000) / 10 : null;
+  return (
+    <span className={cls}>
+      {sign}{rounded.toFixed(2)} kg
+      {percent !== null && <span className="muted small"> ({percent > 0 ? "+" : ""}{percent.toFixed(1)}%)</span>}
+    </span>
+  );
 }
 
 export function GradeBadge({ grade }: { grade: Grade | null }) {

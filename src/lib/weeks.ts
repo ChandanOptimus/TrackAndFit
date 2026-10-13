@@ -43,24 +43,29 @@ export function todayISO(now = new Date()): string {
 }
 
 /**
- * Grading is based on how much the weekly average dropped versus the week before.
- * Tweak the bands here.
- *   A: lost 0.5 - 1.0 kg   (ideal pace)
- *   B: lost 0.25 - 0.5 kg, or more than 1.0 kg (too fast)
- *   C: lost 0 - 0.25 kg    (barely moving)
+ * Grading is based on how much the weekly average dropped versus the week before, as a
+ * percentage of body weight, so the same bands suit a lighter and a heavier person.
+ *   A: lost 0.5 - 1.0 %    (ideal pace)
+ *   B: lost 0.25 - 0.5 %, or more than 1.0 % (too fast)
+ *   C: lost 0 - 0.25 %     (barely moving)
  *   D: gained weight
  */
-export function gradeForChange(change: number): Grade {
-  const loss = Math.round(-change * 100) / 100;
-  if (loss < 0) return "D";
-  if (loss < 0.25) return "C";
-  if (loss < 0.5) return "B";
-  if (loss <= 1) return "A";
+export function gradeForChange(change: number, previousAverage: number): Grade {
+  const lossPercent = Math.round((-change / previousAverage) * 10000) / 100;
+  if (lossPercent < 0) return "D";
+  if (lossPercent < 0.25) return "C";
+  if (lossPercent < 0.5) return "B";
+  if (lossPercent <= 1) return "A";
   return "B";
 }
 
 /** Weeks are consecutive 7-day blocks counted from the user's first logged day. */
-export function buildWeeks(entries: Entries, today: string): WeekSummary[] {
+export function buildWeeks(
+  entries: Entries,
+  today: string,
+  /** How a finished week's targets are worked out from its average weight. Defaults to the plain formulas. */
+  targetsFor: (average: number, week: { start: string; end: string }) => Targets = (avg) => calculateTargets(avg),
+): WeekSummary[] {
   const dates = Object.keys(entries).sort();
   if (dates.length === 0) return [];
 
@@ -88,9 +93,9 @@ export function buildWeeks(entries: Entries, today: string): WeekSummary[] {
       entryCount: weights.length,
       average,
       change,
-      grade: complete && change !== null ? gradeForChange(change) : null,
+      grade: complete && change !== null && prevAverage !== null ? gradeForChange(change, prevAverage) : null,
       complete,
-      targets: complete && average !== null ? calculateTargets(average) : null,
+      targets: complete && average !== null ? targetsFor(average, { start, end }) : null,
     });
   }
   return weeks;
