@@ -1,3 +1,4 @@
+import { LEVEL_LABEL, type Level } from "@/lib/health";
 import type { Grade } from "@/lib/weeks";
 
 export function formatDate(date: string): string {
@@ -30,4 +31,14 @@ export function Loading({ error }: { error: boolean }) {
   ) : (
     <p className="muted">Loading…</p>
   );
+}
+
+/** "13 Oct 26": short enough for a phone-width table. */
+export function formatDateShort(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" });
+}
+
+export function LevelPill({ level }: { level: Level }) {
+  return <span className={`pill pill-${level}`}>{LEVEL_LABEL[level]}</span>;
 }

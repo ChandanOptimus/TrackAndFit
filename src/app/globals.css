@@ -378,3 +378,38 @@ tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
   .food-form .other-fields { grid-template-columns: repeat(3, 1fr); }
   .landing { padding-top: 6rem; }
 }
+
+/* ---------- BMI / body fat ---------- */
+.pill { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; line-height: 1.5; white-space: nowrap; }
+.pill-low { background: #dbeafe; color: #1d4ed8; }
+.pill-standard { background: #d6f5e3; color: #0f7a46; }
+.pill-high { background: #fde9c8; color: #a15c00; }
+.pill-toohigh { background: #fddcdc; color: #b42318; }
+@media (prefers-color-scheme: dark) {
+  .pill-low { background: rgba(96, 165, 250, 0.22); color: #93c5fd; }
+  .pill-standard { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; }
+  .pill-high { background: rgba(251, 191, 36, 0.2); color: #fcd34d; }
+  .pill-toohigh { background: rgba(248, 113, 113, 0.22); color: #fca5a5; }
+}
+.hero-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.9rem; }
+.hero-stats .label { color: rgba(255, 255, 255, 0.85); }
+.hero-stats .stat-value { font-size: 1.25rem; font-weight: 800; margin-right: 0.4rem; }
+.hero .pill { background: rgba(255, 255, 255, 0.92); }
+.hero .pill-low { color: #1d4ed8; }
+.hero .pill-standard { color: #0f7a46; }
+.hero .pill-high { color: #a15c00; }
+.hero .pill-toohigh { color: #b42318; }
+.metric-cell { white-space: nowrap; }
+.metric-cell .pill { display: block; width: max-content; margin-top: 0.15rem; font-size: 0.65rem; padding: 0.05rem 0.45rem; }
+.weight-form .bf-field { min-width: 0; }
+.height-panel { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: flex-end; }
+.height-panel label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.height-panel .hint { flex: 1 1 220px; margin: 0; }
+@media (max-width: 1024px) {
+  .weight-form { grid-template-columns: 1.5fr 1fr 1fr; }
+  .weight-form button { grid-column: 1 / -1; }
+  .weight-history th, .weight-history td { padding: 0.6rem 0.5rem; }
+  .weight-history th:first-child, .weight-history td:first-child { padding-left: 0.8rem; }
+}
+.hero-link { color: #fff; font-weight: 700; text-decoration: underline; }
+.stat-inline { font-weight: 700; margin-right: 0.25rem; }

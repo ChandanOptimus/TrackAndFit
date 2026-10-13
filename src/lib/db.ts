@@ -11,7 +11,15 @@ async function setup(sql: Sql) {
       user_id text NOT NULL,
       day date NOT NULL,
       kg numeric(5, 2) NOT NULL,
+      body_fat numeric(4, 1),
       PRIMARY KEY (user_id, day)
+    )`;
+  // Body fat is typed in by hand when logging a weight. Safe to repeat on tables that already exist.
+  await sql`ALTER TABLE weights ADD COLUMN IF NOT EXISTS body_fat numeric(4, 1)`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS profiles (
+      user_id text PRIMARY KEY,
+      height_cm numeric(5, 1)
     )`;
 
   // Seed the starter foods only when the table is created for the first time,

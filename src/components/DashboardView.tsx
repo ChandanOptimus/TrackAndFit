@@ -3,17 +3,20 @@
 import Link from "next/link";
 import { calculateTargets } from "@/lib/formulas";
 import { useFoodLog, useFoods } from "@/lib/food-store";
+import { bmiLevel, bmiOf, bodyFatLevel } from "@/lib/health";
 import { totalsFor } from "@/lib/nutrition";
+import { useHeight } from "@/lib/profile-store";
 import { useWeightEntries } from "@/lib/storage";
 import { getUser } from "@/lib/users";
 import { buildWeeks, todayISO } from "@/lib/weeks";
-import { ChangeText, GradeBadge, Loading, formatDate } from "./format";
+import { ChangeText, GradeBadge, LevelPill, Loading, formatDate } from "./format";
 import { IntakeSummary } from "./IntakeSummary";
 import { TargetsGrid } from "./TargetsGrid";
 
 export function DashboardView({ userId }: { userId: string }) {
   const user = getUser(userId);
-  const { entries, loadError } = useWeightEntries(userId);
+  const { entries, bodyFat, loadError } = useWeightEntries(userId);
+  const { heightCm } = useHeight(userId);
   const today = todayISO();
   const { foods, loadError: foodsError } = useFoods();
   const { entries: foodLog, loadError: foodLogError } = useFoodLog(userId, today);
@@ -23,6 +26,10 @@ export function DashboardView({ userId }: { userId: string }) {
   const dates = Object.keys(entries).sort();
   const latestDate = dates[dates.length - 1];
   const latestWeight = latestDate ? entries[latestDate] : null;
+
+  const bmi = latestWeight !== null && heightCm ? bmiOf(latestWeight, heightCm) : null;
+  const fatDate = Object.keys(bodyFat).sort().pop(); // most recent day a body fat value was entered
+  const latestFat = fatDate ? bodyFat[fatDate] : null;
 
   const completed = buildWeeks(entries, today).filter((w) => w.complete && w.average !== null);
   const lastWeek = completed[completed.length - 1];
@@ -46,6 +53,26 @@ export function DashboardView({ userId }: { userId: string }) {
               {latestWeight.toFixed(1)} <small>kg</small>
             </p>
             <div className="hero-sub">Logged {formatDate(latestDate)}</div>
+            <div className="hero-stats">
+              <div>
+                <div className="label">BMI</div>
+                {bmi !== null ? (
+                  <>
+                    <span className="stat-value">{bmi.toFixed(1)}</span>
+                    <LevelPill level={bmiLevel(bmi)} />
+                  </>
+                ) : (
+                  <Link className="hero-link" href={`/${userId}/weight`}>Add your height →</Link>
+                )}
+              </div>
+              {latestFat !== null && fatDate && (
+                <div>
+                  <div className="label">Body fat · {formatDate(fatDate)}</div>
+                  <span className="stat-value">{latestFat.toFixed(1)}%</span>
+                  <LevelPill level={bodyFatLevel(latestFat)} />
+                </div>
+              )}
+            </div>
           </section>
 
           <section>

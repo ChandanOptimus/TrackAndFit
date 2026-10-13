@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { average, bmiLevel, bmiOf, bodyFatLevel, valuesBetween } from "@/lib/health";
+import { useHeight } from "@/lib/profile-store";
 import { useWeightEntries } from "@/lib/storage";
 import { buildWeeks, todayISO } from "@/lib/weeks";
-import { ChangeText, GradeBadge, Loading, formatDate } from "./format";
+import { ChangeText, GradeBadge, LevelPill, Loading, formatDate } from "./format";
 import { TargetsGrid } from "./TargetsGrid";
 
 export function WeeklyView({ userId }: { userId: string }) {
-  const { entries, loadError } = useWeightEntries(userId);
+  const { entries, bodyFat, loadError } = useWeightEntries(userId);
+  const { heightCm } = useHeight(userId);
   if (!entries) return <Loading error={loadError} />;
 
   const weeks = buildWeeks(entries, todayISO()).reverse();
@@ -25,7 +28,11 @@ export function WeeklyView({ userId }: { userId: string }) {
           Nothing to report yet. <Link href={`/${userId}/weight`}>Log your weight</Link> to get started.
         </p>
       ) : (
-        weeks.map((w) => (
+        weeks.map((w) => {
+          const avgBmi = w.average !== null && heightCm ? bmiOf(w.average, heightCm) : null;
+          const avgFat = average(valuesBetween(bodyFat, w.start, w.end));
+          const avgFatRounded = avgFat === null ? null : Math.round(avgFat * 10) / 10;
+          return (
           <section key={w.index} className="panel week">
             <div className="row">
               <div>
@@ -38,6 +45,18 @@ export function WeeklyView({ userId }: { userId: string }) {
                 <div className="label">Average</div>
                 {w.average === null ? <span className="muted">No entries</span> : `${w.average.toFixed(2)} kg`}
               </div>
+              {avgBmi !== null && (
+                <div>
+                  <div className="label">Avg BMI</div>
+                  <span className="stat-inline">{avgBmi.toFixed(1)}</span> <LevelPill level={bmiLevel(avgBmi)} />
+                </div>
+              )}
+              {avgFatRounded !== null && (
+                <div>
+                  <div className="label">Avg body fat</div>
+                  <span className="stat-inline">{avgFatRounded.toFixed(1)}%</span> <LevelPill level={bodyFatLevel(avgFatRounded)} />
+                </div>
+              )}
               <div>
                 <div className="label">Change vs previous week</div>
                 <ChangeText change={w.change} />
@@ -54,7 +73,8 @@ export function WeeklyView({ userId }: { userId: string }) {
               </>
             )}
           </section>
-        ))
+          );
+        })
       )}
 
       <h2>Grading</h2>
