@@ -28,6 +28,12 @@ const ICONS = {
       <path d="M17.5 21V3c-2.2 1.2-3.5 3.7-3.5 7v2.5h3.5" />
     </svg>
   ),
+  progress: (
+    <svg {...icon}>
+      <path d="M3 17 9 11l4 4 8-9" />
+      <path d="M15 6h6v6" />
+    </svg>
+  ),
   weekly: (
     <svg {...icon}>
       <path d="M4 20V10M10 20V4M16 20v-7M21 20H3" />
@@ -43,6 +49,7 @@ export function UserNav({ user }: { user: User }) {
     { href: `/${user.id}/dashboard`, label: "Dashboard", tab: "Dashboard", icon: ICONS.dashboard },
     { href: `/${user.id}/weight`, label: "Log weight", tab: "Weight", icon: ICONS.weight },
     { href: `/${user.id}/food`, label: "Food", tab: "Food", icon: ICONS.food },
+    { href: `/${user.id}/progress`, label: "Progress", tab: "Progress", icon: ICONS.progress },
     { href: `/${user.id}/weekly`, label: "Weekly report", tab: "Weekly", icon: ICONS.weekly },
   ];
 

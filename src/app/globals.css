@@ -308,7 +308,7 @@ tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
   .switch, button.lock { padding: 0.3rem 0.75rem; min-height: 32px; display: inline-flex; align-items: center; }
 
   .tabbar {
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(5, 1fr);
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom));
     background: color-mix(in srgb, var(--surface) 82%, transparent);
@@ -430,3 +430,23 @@ tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
 .plan-note { border-left: 6px solid var(--down); margin: 0.5rem 0 0.9rem; padding: 0.7rem 1rem; }
 .plan-note.plan-half { border-left-color: #f4a21f; }
 .plan-note.plan-none { border-left-color: #3aa7ff; }
+
+/* ---------- Progress charts ---------- */
+.range-tabs { display: inline-flex; background: var(--user-soft); border-radius: 999px; padding: 3px; gap: 2px; }
+.range-tabs button { background: none; box-shadow: none; color: var(--muted); padding: 0.35rem 0.85rem; min-height: 0; font-size: 0.85rem; font-weight: 800; }
+.range-tabs button.active { background: var(--surface); color: var(--user); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15); }
+.range-tabs button:hover { transform: none; filter: none; }
+.chart-card { padding: 1rem 1rem 0.75rem; margin: 0.9rem 0; }
+.chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.chart-value { font-size: 1.9rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
+.chart-value small { font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+.chart-delta { text-align: right; font-weight: 800; }
+.chart-box { width: 100%; margin-top: 0.5rem; }
+.chart-svg { display: block; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+.chart-grid { stroke: var(--border); stroke-width: 1; }
+.chart-label { fill: var(--muted); font-size: 11px; font-weight: 700; }
+.chart-cursor { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.chart-active { fill: var(--surface); stroke-width: 3; }
+.chart-empty { padding: 1.25rem 0 0.75rem; margin: 0; }
+.chart-legend { list-style: none; margin: 0.35rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.78rem; font-weight: 700; }
+.chart-legend .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 3px; margin-right: 0.35rem; vertical-align: -1px; }
